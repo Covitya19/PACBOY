@@ -71,12 +71,15 @@ class Wall(sprite.Sprite):
 class Cherry(sprite.Sprite):
     def __init__(self, cherx, chery, img):
         super().__init__()
-        self.rect = self.image.get_rect()
         self.image = transform.scale(image.load(img), (65, 65))
         self.rect = self.image.get_rect()
         self.rect.x = cherx
         self.rect.y = chery
-    
+
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+        
+
 font.init()
 font = font.SysFont('Arial', 35)
 
@@ -86,19 +89,21 @@ pobeda = font.render('Ты победил!!!', True, (0, 255, 0))
 running = True
 finish = False
 
-window_size = (1400, 1000)
+window_size = (800, 600)
 FPS = 60
 clock = time.Clock()
 
 window = display.set_mode(window_size)
 display.set_caption('POCMAN')
 
-player = Player(700, 500, 3, '')
+background = transform.scale(image.load('negrfon_py.jpg'), window_size)
 
-ghost1 = Enemy(500, 500, 5, '')
-ghost2 = Enemy(500, 500, 5, '')
-ghost3 = Enemy(500, 500, 5, '')
-ghost4 = Enemy(500, 500, 5, '')
+player = Player(700, 500, 3, 'cherry_py_vlap.png')
+
+ghost1 = Enemy(500, 500, 5, 'cherry_py_vlap.png')
+ghost2 = Enemy(500, 500, 5, 'cherry_py_vlap.png')
+ghost3 = Enemy(500, 500, 5, 'cherry_py_vlap.png')
+ghost4 = Enemy(500, 500, 5, 'cherry_py_vlap.png')
 
 w1 = Wall(200, 50, 500, 500, 0, 0, 255)
 w2 = Wall(200, 50, 500, 500, 0, 0, 255)
@@ -109,10 +114,10 @@ w6 = Wall(50, 200, 500, 500, 0, 0, 255)
 w7 = Wall(50, 200, 500, 500, 0, 0, 255)
 w8 = Wall(50, 200, 500, 500, 0, 0, 255)
 
-cher1 = Cherry(500, 500, 'cherry_py.png')
-cher2 = Cherry(500, 500, 'cherry_py.png')
-cher3 = Cherry(500, 500, 'cherry_py.png')
-cher4 = Cherry(500, 500, 'cherry_py.png')
+cher1 = Cherry(500, 500, 'cherry_py_vlap.png')
+cher2 = Cherry(500, 500, 'cherry_py_vlap.png')
+cher3 = Cherry(500, 500, 'cherry_py_vlap.png')
+cher4 = Cherry(500, 500, 'cherry_py_vlap.png')
 
 timerr = 30
 schet = 0
@@ -127,7 +132,7 @@ ghosts.add(ghost4)
 
 while running:
     for e in event.get():
-        if e.tipe == QUIT:
+        if e.type == QUIT:
             running = False
 
     while finish != True:
@@ -149,22 +154,22 @@ while running:
         w8.draw_wall()
 
 
-        if sprite.collide_rect(player, ghost1) or sprite.collide_rect(player, ghost2) or sprite.collide_rect(player, ghost3) or sprite.collide_rect(player, ghost4):
-            finish = True
-            window.blit(lose, (350, 250))
+#        if sprite.collide_rect(player, ghost1) or sprite.collide_rect(player, ghost2) or sprite.collide_rect(player, ghost3) or sprite.collide_rect(player, ghost4):
+#            finish = True
+#            window.blit(lose, (350, 250))
 
-        if sprite.collide_rect(player, cher1) or sprite.collide_rect(player, cher2) or sprite.collide_rect(player, cher3) or sprite.collide_rect(player, cher4):
-            cherrytimer = True
-            time1 = timer()
+#        if sprite.collide_rect(player, cher1) or sprite.collide_rect(player, cher2) or sprite.collide_rect(player, cher3) or sprite.collide_rect(player, cher4):
+#            cherrytimer = True
+#            time1 = timer()
 
-        if cherrytimer == True:
-            time2 = timer()
-            if time2 - time1 < 30:
-                if sprite.collide_rect(player, ghost1) or sprite.collide_rect(player, ghost2) or sprite.collide_rect(player, ghost3) or sprite.collide_rect(player, ghost4):
-                    schet += 1
+#        if cherrytimer == True:
+#            time2 = timer()
+#            if time2 - time1 < 30:
+#                if sprite.collide_rect(player, ghost1) or sprite.collide_rect(player, ghost2) or sprite.collide_rect(player, ghost3) or sprite.collide_rect(player, ghost4):
+#                    schet += 1
 
-            else:
-                cherrytimer = False
+#            else:
+#                cherrytimer = False
 
         player.reset()
 
@@ -172,15 +177,6 @@ while running:
         ghost2.reset()
         ghost3.reset()
         ghost4.reset()
-
-        w1.reset()
-        w2.reset()
-        w3.reset()
-        w4.reset()
-        w5.reset()
-        w6.reset()
-        w7.reset()
-        w8.reset()
 
         cher1.reset()
         cher2.reset()
