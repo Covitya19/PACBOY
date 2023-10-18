@@ -1,0 +1,197 @@
+from pygame import *
+from random import randint
+from time import time as timer
+
+
+class GameSprite(sprite.Sprite):
+    def __init__(self, x, y, speed, img):
+        super().__init__()
+        self.speed = speed
+        self.image = transform.scale(image.load(img), (65, 65))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Player(GameSprite):    
+    def update(self):
+        keys_pressed = key.get_pressed()
+        if keys_pressed[K_w]:
+            self.rect.y -= self.speed
+        if keys_pressed[K_s]:
+            self.rect.y += self.speed
+        if keys_pressed[K_a]:
+            self.rect.x -= self.speed
+        if keys_pressed[K_d]:
+            self.rect.x += self.speed
+
+class Enemy(GameSprite):
+    direction1 = 'up'
+    direction2 = 'right'
+    def update(self):
+        if self.rect.y <= 40:
+            self.direction1 = 'down'
+        if self.rect.y >= 450:
+            self.direction1 = 'up'
+
+        if self.direction1 == 'down':
+            self.rect.y += self.speed
+        else:
+            self.rect.y -= self.speed
+
+        
+    def update2(self):
+        if self.rect.x <= 470:
+            self.direction2 = 'right'
+        if self.rect.x >= 600:
+            self.direction2 = 'left'
+
+        if self.direction2 == 'left':
+            self.rect.x -= self.speed
+        else:
+            self.rect.x += self.speed
+
+class Wall(sprite.Sprite):
+    def __init__(self, widht, height, wallx, wally, color1, color2, color3):
+        super().__init__()
+        self.width = widht
+        self.height = height
+        self.image = Surface([self.width, self.height])
+        self.image.fill([color1, color2, color3])
+        self.rect = self.image.get_rect()
+        self.rect.x = wallx
+        self.rect.y = wally
+
+    def draw_wall(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+class Cherry(sprite.Sprite):
+    def __init__(self, cherx, chery, img):
+        super().__init__()
+        self.image = transform.scale(image.load(img), (65, 65))
+        self.rect = self.image.get_rect()
+        self.rect.x = cherx
+        self.rect.y = chery
+
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+        
+
+font.init()
+font = font.SysFont('Arial', 35)
+
+lose = font.render('Ты проиграл(((', True, (255, 0, 0))
+pobeda = font.render('Ты победил!!!', True, (0, 255, 0))
+
+timmmm = font.render('timer is on', True, (255, 0, 0))
+running = True
+finish = False
+
+window_size = (800, 600)
+FPS = 60
+clock = time.Clock()
+
+window = display.set_mode(window_size)
+display.set_caption('POCMAN')
+
+background = transform.scale(image.load('blackback.jpg'), window_size)
+
+player = Player(750, 550, 10, 'pocman_py.png')
+
+
+
+w1 = Wall(30, 75, 75, 75, 0, 0, 255)
+w2 = Wall(30, 75, 670, 113, 0, 0, 255)
+w3 = Wall(30, 100, 500, 500, 0, 0, 255)
+w4 = Wall(30, 100, 500, 500, 0, 0, 255)
+w5 = Wall(75, 30, 105, 75, 0, 0, 255)
+w6 = Wall(75, 30, 600, 158, 0, 0, 255)
+w7 = Wall(100, 30, 500, 500, 0, 0, 255)
+w8 = Wall(100, 30, 500, 500, 0, 0, 255)
+
+cherries = sprite.Group()
+cher1 = Cherry(100, 500, 'cherry_py_vlap.png')
+cher2 = Cherry(500, 500, 'cherry_py_vlap.png')
+cherries.add(cher1)
+cherries.add(cher2)
+
+timerr = 30
+schet = 0
+
+cherrytimer = False
+
+ghosts = sprite.Group()
+
+ghost1 = Enemy(500, 300, 5, 'cherry_py_vlap.png')
+ghost2 = Enemy(500, 200, 5, 'cherry_py_vlap.png')
+ghost3 = Enemy(500, 500, 5, 'cherry_py_vlap.png')
+ghost4 = Enemy(500, 500, 5, 'cherry_py_vlap.png')
+ghosts.add(ghost1)
+ghosts.add(ghost2)
+ghosts.add(ghost3)
+ghosts.add(ghost4)
+
+
+
+while running:
+    for e in event.get():
+        if e.type == QUIT:
+            running = False
+
+    if finish != True:
+        window.blit(background, (0, 0))
+        player.update()
+
+        ghost1.update()
+        ghost2.update()
+        ghost3.update2()
+        ghost4.update2()
+
+        w1.draw_wall()
+        w2.draw_wall()
+        w3.draw_wall()
+        w4.draw_wall()
+        w5.draw_wall()
+        w6.draw_wall()
+        w7.draw_wall()
+        w8.draw_wall()
+
+        if sprite.collide_rect(player, w1) or sprite.collide_rect(player, w2) or sprite.collide_rect(player, w3) or sprite.collide_rect(player, w4) or sprite.collide_rect(player, w5) or sprite.collide_rect(player, w6) or sprite.collide_rect(player, w7) or sprite.collide_rect(player, w8):
+           finish = True
+           window.blit(lose, (200, 200))
+
+
+        if sprite.spritecollide(player, cherries, True):
+            cherrytimer = True
+            time1 = timer()
+
+        if cherrytimer == True:
+            time2 = timer()
+            if time2 - time1 < 30:
+                window.blit(timmmm, (350, 250))
+                if sprite.spritecollide(player, ghosts, True):
+                    print('i')
+                    schet += 1
+            else:
+                cherrytimer = False
+    
+        else:
+            if sprite.collide_rect(player, ghost1) or sprite.collide_rect(player, ghost2) or sprite.collide_rect(player, ghost3) or sprite.collide_rect(player, ghost4):            
+                finish = True
+                window.blit(lose, (350, 250))
+                
+        
+        if schet == 4:
+            window.blit(pobeda, (350, 250))
+            finish = True
+
+        player.reset()
+
+        ghosts.draw(window)
+        cherries.draw(window)
+
+    display.update()
+    clock.tick(FPS)
